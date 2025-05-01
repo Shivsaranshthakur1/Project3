@@ -27,3 +27,6 @@ jobs:
 
     - name: Run
       run: COMP36212_EX3_Code/mnist_optimiser.out mnist_data/ || true
+
+    - name: Run Tests
+      run: make -C COMP36212_EX3_Code test

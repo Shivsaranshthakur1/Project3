@@ -18,3 +18,6 @@ clean:
 
 format:
 	clang-format -i -style=file *.c *.h
+test:
+	gcc -o tests/test_runner tests/test_utils.c
+	./tests/test_runner
