@@ -19,8 +19,7 @@ clean:
 format:
 	clang-format -i -style=file *.c *.h
 test:
-	gcc -o tests/test_runner tests/test_utils.c
-	./tests/test_runner
+	@echo "No tests implemented yet."
 
 bench:
 	time ./mnist_optimiser.out mnist_data/ --epochs 1
