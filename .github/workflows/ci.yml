@@ -45,3 +45,9 @@ jobs:
       run: |
         export PYTHONPATH=COMP36212_EX3_Code
         python3 scripts/finite_diff_check.py
+
+    - name: Run Gradcheck Target
+      run: make -C . gradcheck || true
+
+    - name: Run Plot Target
+      run: make -C . plot
