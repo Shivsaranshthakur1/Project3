@@ -52,6 +52,7 @@ void run_optimisation(void) {
                     mean_loss = mean_loss / ((double)log_freq);
                 }
                 test_accuracy = evaluate_testing_accuracy();
+    printf("EPOCH_LOG,%u,%f,%f\n", epoch_counter, mean_loss, test_accuracy);
                 print_training_stats(epoch_counter, total_iter, mean_loss, test_accuracy);
                 mean_loss = 0.0;
             }
@@ -71,6 +72,7 @@ void run_optimisation(void) {
     }
 
     test_accuracy = evaluate_testing_accuracy();
+    printf("EPOCH_LOG,%u,%f,%f\n", epoch_counter, mean_loss, test_accuracy);
     print_training_stats(epoch_counter, total_iter, (mean_loss / ((double)log_freq)),
                          test_accuracy);
 }
@@ -101,4 +103,8 @@ void update_parameters(unsigned int batch_sz) {
     apply_and_zero(&w_L2_L3[0][0], N_NEURONS_L2, N_NEURONS_L3, scale);
     apply_and_zero(&w_L1_L2[0][0], N_NEURONS_L1, N_NEURONS_L2, scale);
     apply_and_zero(&w_LI_L1[0][0], N_NEURONS_LI, N_NEURONS_L1, scale);
+}
+
+void update_parameters_momentum(unsigned int batch_sz) {
+    // Momentum update logic to be implemented in Part II
 }

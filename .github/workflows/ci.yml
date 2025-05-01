@@ -51,3 +51,6 @@ jobs:
 
     - name: Run Plot Target
       run: make -C . plot
+
+    - name: Run Loss Trace Check
+      run: make -C . quickcheck

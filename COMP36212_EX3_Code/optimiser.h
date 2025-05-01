@@ -8,3 +8,11 @@ void run_optimisation(void);
 double evaluate_objective_function(unsigned int sample);
 
 #endif /* OPTMISER_H */
+
+typedef struct {
+    double w;
+    double dw;
+    double velocity;
+} weight_momentum_struct_t;
+
+void update_parameters_momentum(unsigned int batch_sz);
