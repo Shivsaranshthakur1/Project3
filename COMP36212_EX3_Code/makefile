@@ -21,3 +21,6 @@ format:
 test:
 	gcc -o tests/test_runner tests/test_utils.c
 	./tests/test_runner
+
+bench:
+	time ./mnist_optimiser.out mnist_data/ --epochs 1
