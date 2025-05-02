@@ -7,51 +7,35 @@
 #include "optimiser.h"
 
 void print_help_and_exit(char** argv) {
-    printf("usage: %s <path_to_dataset> <learning_rate> <batch_size> <total_epochs>\n", argv[0]);
+    printf(
+        "usage: %s <path_to_dataset> <lr0> <lrN> <batch_size> <total_epochs> <opt_flag> "
+        "<momentum|beta1> <beta2> <eps>\n",
+        argv[0]);
     exit(0);
 }
 
 int main(int argc, char** argv) {
-    if (argc != 5) {
-        printf("ERROR: incorrect number of arguments\n");
-        print_help_and_exit(argv);
+    if (argc != 10) {
+        printf(
+            "usage: %s <dataset> <lr0> <lrN> <batch> <epochs> <opt_flag> <momentum/b1> <b2> "
+            "<eps>\n",
+            argv[0]);
+        exit(1);
     }
 
-    const char* path_to_dataset = argv[1];
-    double learning_rate = atof(argv[2]);
-    unsigned int batch_size = atoi(argv[3]);
-    unsigned int total_epochs = atoi(argv[4]);
+    const char* dataset = argv[1];
+    double lr0 = atof(argv[2]);
+    double lrN = atof(argv[3]);
+    unsigned batch = atoi(argv[4]);
+    unsigned epochs = atoi(argv[5]);
+    int flag = atoi(argv[6]);
+    double b1_mom = atof(argv[7]);
+    double b2 = atof(argv[8]);
+    double eps = atof(argv[9]);
 
-    if (!path_to_dataset || !learning_rate || !batch_size || !total_epochs) {
-        printf("ERROR: invalid argument\n");
-        print_help_and_exit(argv);
-    }
-
-    printf("********************************************************************************\n");
-    printf("Initialising Dataset... \n");
-    printf("********************************************************************************\n");
-    initialise_dataset(path_to_dataset,
-                       0  // print flag
-    );
-
-    printf("********************************************************************************\n");
-    printf("Initialising neural network... \n");
-    printf("********************************************************************************\n");
+    initialise_dataset(dataset, 0);
     initialise_nn();
-
-    printf("********************************************************************************\n");
-    printf("Initialising optimiser...\n");
-    printf("********************************************************************************\n");
-    initialise_optimiser(learning_rate, batch_size, total_epochs);
-
-    printf("********************************************************************************\n");
-    printf("Performing training optimisation...\n");
-    printf("********************************************************************************\n");
+    initialise_optimiser(lr0, lrN, batch, epochs, b1_mom, b2, eps, flag);
     run_optimisation();
-
-    printf("********************************************************************************\n");
-    printf("Program complete... \n");
-    printf("********************************************************************************\n");
     free_dataset_data_structures();
-    return 0;
 }

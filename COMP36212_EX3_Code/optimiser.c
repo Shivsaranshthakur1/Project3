@@ -1,22 +1,22 @@
 #include "optimiser.h"
 
-#include "math.h"
+#include <assert.h>
+#include <math.h>
+#include <stdlib.h>
+
 #include "mnist_helper.h"
 #include "neural_network.h"
 
-// Function declarations
-void update_parameters(unsigned int batch_size);
-void print_training_stats(unsigned int epoch_counter, unsigned int total_iter, double mean_loss,
-                          double test_accuracy);
-
-// Optimisation parameters
-unsigned int log_freq = 30000;  // Compute and print accuracy every log_freq iterations
-
-// Parameters passed from command line arguments
+unsigned int log_freq = 30000;
 unsigned int num_batches;
 unsigned int batch_size;
 unsigned int total_epochs;
-double learning_rate;
+double lr0, lrN, momentum, beta1, beta2, epsilon;
+int opt_flag;
+
+static inline double lr_epoch(unsigned k, unsigned N) {
+    return lr0 * (1.0 - (double)k / N) + lrN * ((double)k / N);
+}
 
 void print_training_stats(unsigned int epoch_counter, unsigned int total_iter, double mean_loss,
                           double test_accuracy) {
@@ -24,57 +24,92 @@ void print_training_stats(unsigned int epoch_counter, unsigned int total_iter, d
            total_iter, mean_loss, test_accuracy);
 }
 
-void initialise_optimiser(double cmd_line_learning_rate, int cmd_line_batch_size,
-                          int cmd_line_total_epochs) {
-    batch_size = cmd_line_batch_size;
-    learning_rate = cmd_line_learning_rate;
-    total_epochs = cmd_line_total_epochs;
+void initialise_optimiser(double lr0_in, double lrN_in, unsigned bs, unsigned epochs,
+                          double beta1_or_mom, double beta2_in, double eps_in, int flag) {
+    lr0 = lr0_in;
+    lrN = lrN_in;
+    batch_size = bs;
+    total_epochs = epochs;
+    momentum = beta1_or_mom;
+    beta1 = beta1_or_mom;
+    beta2 = beta2_in;
+    epsilon = eps_in;
+    opt_flag = flag;
+    num_batches = epochs * (N_TRAINING_SET / bs);
 
-    num_batches = total_epochs * (N_TRAINING_SET / batch_size);
-    printf(
-        "Optimising with parameters: \n\tepochs = %u \n\tbatch_size = %u \n\tnum_batches = "
-        "%u\n\tlearning_rate = %f\n\n",
-        total_epochs, batch_size, num_batches, learning_rate);
+    printf("Optimising with parameters:\n");
+    printf("\tlr0 = %.6f, lrN = %.6f\n", lr0, lrN);
+    printf("\tbatch_size = %u, epochs = %u\n", batch_size, total_epochs);
+    printf("\tbeta1/momentum = %.6f, beta2 = %.6f, eps = %.6f\n", beta1, beta2, epsilon);
+    printf("\topt_flag = %d\n\n", opt_flag);
 }
 
 void run_optimisation(void) {
     unsigned int training_sample = 0;
     unsigned int total_iter = 0;
-    double obj_func = 0.0;
     unsigned int epoch_counter = 0;
     double test_accuracy = 0.0;
     double mean_loss = 0.0;
+
+    // 📍 Step 3: address print (optimiser side)
+    printf("Address in optimiser.c: %p\n", (void*)&w_LI_L1[0][0].w);
 
     for (int i = 0; i < num_batches; i++) {
         for (int j = 0; j < batch_size; j++) {
             if (total_iter % log_freq == 0 || total_iter == 0) {
                 if (total_iter > 0) {
-                    mean_loss = mean_loss / ((double)log_freq);
+                    mean_loss /= log_freq;
                 }
                 test_accuracy = evaluate_testing_accuracy();
-    printf("EPOCH_LOG,%u,%f,%f\n", epoch_counter, mean_loss, test_accuracy);
+                printf("EPOCH_LOG,%u,%f,%f\n", epoch_counter, mean_loss, test_accuracy);
                 print_training_stats(epoch_counter, total_iter, mean_loss, test_accuracy);
                 mean_loss = 0.0;
             }
 
-            obj_func = evaluate_objective_function(training_sample);
-            mean_loss += obj_func;
+            double loss = evaluate_objective_function(training_sample);
+            mean_loss += loss;
 
-            total_iter++;
-            training_sample++;
+            ++total_iter;
+            ++training_sample;
             if (training_sample == N_TRAINING_SET) {
                 training_sample = 0;
-                epoch_counter++;
+                ++epoch_counter;
             }
         }
 
-        update_parameters(batch_size);
+        double lr_k = lr_epoch(epoch_counter, total_epochs);
+
+        // ✅ Step 1: probe before update
+        if (total_iter == batch_size - 1) {
+            printf("before: w=%e dw=%e v=%e\n", w_LI_L1[0][0].w, w_LI_L1[0][0].dw, w_LI_L1[0][0].v);
+        }
+
+        switch (opt_flag) {
+            case 0:
+                update_parameters(batch_size);
+                break;
+            case 1:
+                update_parameters_momentum(batch_size, lr_k, momentum);
+                // ✅ Step 2: probe after momentum update
+                if (total_iter == batch_size) {
+                    printf("after : w=%e dw=%e v=%e\n", w_LI_L1[0][0].w, w_LI_L1[0][0].dw,
+                           w_LI_L1[0][0].v);
+                }
+                break;
+            case 2:
+                update_parameters_adam(batch_size, lr_k, beta1, beta2, epsilon, total_iter);
+                break;
+            default:
+                fprintf(stderr, "Invalid opt_flag: %d\n", opt_flag);
+                exit(1);
+        }
+
+        assert(!isnan(w_LI_L1[0][0].w));
     }
 
     test_accuracy = evaluate_testing_accuracy();
-    printf("EPOCH_LOG,%u,%f,%f\n", epoch_counter, mean_loss, test_accuracy);
-    print_training_stats(epoch_counter, total_iter, (mean_loss / ((double)log_freq)),
-                         test_accuracy);
+    printf("EPOCH_LOG,%u,%f,%f\n", total_epochs, mean_loss, test_accuracy);
+    print_training_stats(total_epochs, total_iter, mean_loss / log_freq, test_accuracy);
 }
 
 double evaluate_objective_function(unsigned int sample) {
@@ -85,26 +120,59 @@ double evaluate_objective_function(unsigned int sample) {
     return loss;
 }
 
-// SGD batch update implementation
-static inline void apply_and_zero(weight_struct_t* w, unsigned int n_rows, unsigned int n_cols,
-                                  double scale) {
-    for (unsigned int i = 0; i < n_rows; ++i) {
-        for (unsigned int j = 0; j < n_cols; ++j) {
-            weight_struct_t* p = &w[i * n_cols + j];
-            p->w -= scale * p->dw;
-            p->dw = 0.0;
-        }
+// SGD
+static inline void apply_and_zero(weight_t* W, unsigned r, unsigned c, double scale) {
+    for (unsigned i = 0; i < r * c; ++i) {
+        W[i].w -= scale * W[i].dw;
+        W[i].dw = 0.0;
     }
 }
 
-void update_parameters(unsigned int batch_sz) {
-    const double scale = learning_rate / (double)batch_sz;
+void update_parameters(unsigned batch_sz) {
+    const double scale = lr0 / (double)batch_sz;
     apply_and_zero(&w_L3_LO[0][0], N_NEURONS_L3, N_NEURONS_LO, scale);
     apply_and_zero(&w_L2_L3[0][0], N_NEURONS_L2, N_NEURONS_L3, scale);
     apply_and_zero(&w_L1_L2[0][0], N_NEURONS_L1, N_NEURONS_L2, scale);
     apply_and_zero(&w_LI_L1[0][0], N_NEURONS_LI, N_NEURONS_L1, scale);
 }
+// Momentum
+static inline void momentum_layer(weight_t* W, unsigned r, unsigned c, double lr, double beta,
+                                  unsigned batch) {
+    double scale = lr / (double)batch;
+    for (unsigned i = 0; i < r * c; ++i) {
+        W[i].v = beta * W[i].v - scale * W[i].dw;
+        W[i].w += W[i].v;
+        W[i].dw = 0.0;
+    }
+}
 
-void update_parameters_momentum(unsigned int batch_sz) {
-    // Momentum update logic to be implemented in Part II
+void update_parameters_momentum(unsigned batch, double lr, double beta) {
+    momentum_layer(&w_L3_LO[0][0], N_NEURONS_L3, N_NEURONS_LO, lr, beta, batch);
+    momentum_layer(&w_L2_L3[0][0], N_NEURONS_L2, N_NEURONS_L3, lr, beta, batch);
+    momentum_layer(&w_L1_L2[0][0], N_NEURONS_L1, N_NEURONS_L2, lr, beta, batch);
+    momentum_layer(&w_LI_L1[0][0], N_NEURONS_LI, N_NEURONS_L1, lr, beta, batch);
+}
+
+// Adam
+static inline void adam_layer(weight_t* W, unsigned r, unsigned c, double lr, double b1, double b2,
+                              double eps, unsigned batch, unsigned t) {
+    const double scale = lr / (double)batch;
+    const double b1t = 1.0 - pow(b1, t);
+    const double b2t = 1.0 - pow(b2, t);
+    for (unsigned i = 0; i < r * c; ++i) {
+        W[i].v_m = b1 * W[i].v_m + (1.0 - b1) * W[i].dw;
+        W[i].v_v = b2 * W[i].v_v + (1.0 - b2) * (W[i].dw * W[i].dw);
+        double m_hat = W[i].v_m / b1t;
+        double v_hat = W[i].v_v / b2t;
+        W[i].w -= scale * m_hat / (sqrt(v_hat) + eps);
+        W[i].dw = 0.0;
+    }
+}
+
+void update_parameters_adam(unsigned batch, double lr, double b1, double b2, double eps,
+                            unsigned t) {
+    adam_layer(&w_L3_LO[0][0], N_NEURONS_L3, N_NEURONS_LO, lr, b1, b2, eps, batch, t);
+    adam_layer(&w_L2_L3[0][0], N_NEURONS_L2, N_NEURONS_L3, lr, b1, b2, eps, batch, t);
+    adam_layer(&w_L1_L2[0][0], N_NEURONS_L1, N_NEURONS_L2, lr, b1, b2, eps, batch, t);
+    adam_layer(&w_LI_L1[0][0], N_NEURONS_LI, N_NEURONS_L1, lr, b1, b2, eps, batch, t);
 }

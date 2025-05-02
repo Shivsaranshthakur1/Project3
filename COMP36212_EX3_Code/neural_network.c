@@ -22,10 +22,10 @@ n_ReLu n_L3[N_NEURONS_L3];
 n_Out n_LO[N_NEURONS_LO];
 
 // ******** Weight matrices ********
-weight_struct_t w_LI_L1[N_NEURONS_LI][N_NEURONS_L1];
-weight_struct_t w_L1_L2[N_NEURONS_L1][N_NEURONS_L2];
-weight_struct_t w_L2_L3[N_NEURONS_L2][N_NEURONS_L3];
-weight_struct_t w_L3_LO[N_NEURONS_L3][N_NEURONS_LO];
+weight_t w_LI_L1[N_NEURONS_LI][N_NEURONS_L1];
+weight_t w_L1_L2[N_NEURONS_L1][N_NEURONS_L2];
+weight_t w_L2_L3[N_NEURONS_L2][N_NEURONS_L3];
+weight_t w_L3_LO[N_NEURONS_L3][N_NEURONS_LO];
 
 // ******** Gradients for Optimiser ********
 double dL_dW_L3_LO[1][N_NEURONS_L3 * N_NEURONS_LO];
@@ -75,7 +75,7 @@ void inline evaluate_dh_dW_Lh_Lprev(unsigned int n_h, unsigned int n_prev, n_ReL
                                     unsigned int n_W, double J[][n_W]);
 
 void inline evaluate_dh_dh_prev_inc_pre_act(unsigned int n_h, unsigned int n_prev,
-                                            n_ReLu n_Lh[n_prev], weight_struct_t W[][n_h],
+                                            n_ReLu n_Lh[n_prev], weight_t W[][n_h],
                                             double J[][n_prev]);
 void inline evaluate_dh_dW_Lh_Lprev_sparse(unsigned int n_h, unsigned int n_prev,
                                            n_ReLu neur[n_prev], unsigned int n_W, double J[][n_W]);
@@ -164,39 +164,52 @@ void initialise_neurons(void) {
 void initialise_weight_matrices(void) {
     printf("Initialising weight matrices\n");
 
-    double w_limit = sqrt(6) / sqrt(N_NEURONS_LI + N_NEURONS_L1);
-    // Input -> L1
+    double w_limit = sqrt(6.0) / sqrt(N_NEURONS_LI + N_NEURONS_L1);
+
+    // LI → L1
     for (int i = 0; i < N_NEURONS_LI; i++) {
         for (int j = 0; j < N_NEURONS_L1; j++) {
             w_LI_L1[i][j].w = drand(-w_limit, w_limit);
             w_LI_L1[i][j].dw = 0.0;
+            w_LI_L1[i][j].v = 0.0;
+            w_LI_L1[i][j].v_m = 0.0;
+            w_LI_L1[i][j].v_v = 0.0;
         }
     }
 
-    // L1 -> L2
-    w_limit = sqrt(6) / sqrt(N_NEURONS_L1 + N_NEURONS_L2);
+    // 📍 Step 3: probe address from neural_network.c
+    printf("Address in neural_network.c: %p\n", (void*)&w_LI_L1[0][0].w);
+
+    w_limit = sqrt(6.0) / sqrt(N_NEURONS_L1 + N_NEURONS_L2);
     for (int i = 0; i < N_NEURONS_L1; i++) {
         for (int j = 0; j < N_NEURONS_L2; j++) {
             w_L1_L2[i][j].w = drand(-w_limit, w_limit);
             w_L1_L2[i][j].dw = 0.0;
+            w_L1_L2[i][j].v = 0.0;
+            w_L1_L2[i][j].v_m = 0.0;
+            w_L1_L2[i][j].v_v = 0.0;
         }
     }
 
-    // L2->L3
-    w_limit = sqrt(6) / sqrt(N_NEURONS_L2 + N_NEURONS_L3);
+    w_limit = sqrt(6.0) / sqrt(N_NEURONS_L2 + N_NEURONS_L3);
     for (int i = 0; i < N_NEURONS_L2; i++) {
         for (int j = 0; j < N_NEURONS_L3; j++) {
             w_L2_L3[i][j].w = drand(-w_limit, w_limit);
             w_L2_L3[i][j].dw = 0.0;
+            w_L2_L3[i][j].v = 0.0;
+            w_L2_L3[i][j].v_m = 0.0;
+            w_L2_L3[i][j].v_v = 0.0;
         }
     }
 
-    // L3-Output
-    w_limit = sqrt(6) / sqrt(N_NEURONS_L3 + N_NEURONS_LO);
+    w_limit = sqrt(6.0) / sqrt(N_NEURONS_L3 + N_NEURONS_LO);
     for (int i = 0; i < N_NEURONS_L3; i++) {
         for (int j = 0; j < N_NEURONS_LO; j++) {
             w_L3_LO[i][j].w = drand(-w_limit, w_limit);
             w_L3_LO[i][j].dw = 0.0;
+            w_L3_LO[i][j].v = 0.0;
+            w_L3_LO[i][j].v_m = 0.0;
+            w_L3_LO[i][j].v_v = 0.0;
         }
     }
 }
@@ -350,7 +363,7 @@ void inline evaluate_dh1_dW_LI_L1_sparse(unsigned int sample) {
 }
 
 void inline evaluate_dh_dh_prev_inc_pre_act(unsigned int n_h, unsigned int n_prev,
-                                            n_ReLu n_Lh[n_prev], weight_struct_t W[][n_h],
+                                            n_ReLu n_Lh[n_prev], weight_t W[][n_h],
                                             double J[][n_prev]) {
     for (int i = 0; i < n_h; i++) {
         for (int j = 0; j < n_prev; j++) {

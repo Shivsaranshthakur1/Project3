@@ -1,0 +1,81 @@
+********************************************************************************
+Initialising Dataset... 
+********************************************************************************
+Loading training set...
+Training set loaded successfully...
+
+Loading training set labels...
+Training set labels loaded successfully...
+
+Loading testing set...
+Testing set loaded successfully...
+
+Loading testing set labels...
+Testing set labels loaded successfully...
+********************************************************************************
+Initialising neural network... 
+********************************************************************************
+PRNG initialised using seed: 1746174919
+Initialising weight matrices
+Initialising gradient and Jacobian datastructures
+Initialising neuron datastructures
+
+********************************************************************************
+Initialising optimiser...
+********************************************************************************
+Optimising with parameters: 
+	epochs = 10 
+	batch_size = 1 
+	num_batches = 600000
+	lr0 = 0.001000
+	lrN = 0.000100
+	momentum = 0.900000
+
+********************************************************************************
+Performing training optimisation...
+********************************************************************************
+EPOCH_LOG,0,0.000000,0.093900
+Epoch: 0,  Total iter: 0,  Mean Loss: 0.000000000000,  Test Acc: 0.093900
+EPOCH_LOG,0,0.372074,0.936500
+Epoch: 0,  Total iter: 30000,  Mean Loss: 0.372073945773,  Test Acc: 0.936500
+EPOCH_LOG,1,0.156250,0.954500
+Epoch: 1,  Total iter: 60000,  Mean Loss: 0.156250066383,  Test Acc: 0.954500
+EPOCH_LOG,1,0.107025,0.970900
+Epoch: 1,  Total iter: 90000,  Mean Loss: 0.107025250076,  Test Acc: 0.970900
+EPOCH_LOG,2,0.089937,0.968700
+Epoch: 2,  Total iter: 120000,  Mean Loss: 0.089936747041,  Test Acc: 0.968700
+EPOCH_LOG,2,0.066835,0.972600
+Epoch: 2,  Total iter: 150000,  Mean Loss: 0.066834525658,  Test Acc: 0.972600
+EPOCH_LOG,3,0.061292,0.974200
+Epoch: 3,  Total iter: 180000,  Mean Loss: 0.061292240124,  Test Acc: 0.974200
+EPOCH_LOG,3,0.046708,0.975300
+Epoch: 3,  Total iter: 210000,  Mean Loss: 0.046708084584,  Test Acc: 0.975300
+EPOCH_LOG,4,0.039903,0.972800
+Epoch: 4,  Total iter: 240000,  Mean Loss: 0.039903271511,  Test Acc: 0.972800
+EPOCH_LOG,4,0.031753,0.977500
+Epoch: 4,  Total iter: 270000,  Mean Loss: 0.031753093347,  Test Acc: 0.977500
+EPOCH_LOG,5,0.028689,0.974400
+Epoch: 5,  Total iter: 300000,  Mean Loss: 0.028688565994,  Test Acc: 0.974400
+EPOCH_LOG,5,0.022538,0.980700
+Epoch: 5,  Total iter: 330000,  Mean Loss: 0.022538000458,  Test Acc: 0.980700
+EPOCH_LOG,6,0.021733,0.976600
+Epoch: 6,  Total iter: 360000,  Mean Loss: 0.021733336416,  Test Acc: 0.976600
+EPOCH_LOG,6,0.014417,0.982700
+Epoch: 6,  Total iter: 390000,  Mean Loss: 0.014416980471,  Test Acc: 0.982700
+EPOCH_LOG,7,0.012523,0.979400
+Epoch: 7,  Total iter: 420000,  Mean Loss: 0.012523083722,  Test Acc: 0.979400
+EPOCH_LOG,7,0.009447,0.979400
+Epoch: 7,  Total iter: 450000,  Mean Loss: 0.009447043947,  Test Acc: 0.979400
+EPOCH_LOG,8,0.007106,0.979900
+Epoch: 8,  Total iter: 480000,  Mean Loss: 0.007106491231,  Test Acc: 0.979900
+EPOCH_LOG,8,0.005017,0.983500
+Epoch: 8,  Total iter: 510000,  Mean Loss: 0.005016950386,  Test Acc: 0.983500
+EPOCH_LOG,9,0.003572,0.982500
+Epoch: 9,  Total iter: 540000,  Mean Loss: 0.003572402980,  Test Acc: 0.982500
+EPOCH_LOG,9,0.002716,0.983500
+Epoch: 9,  Total iter: 570000,  Mean Loss: 0.002715553019,  Test Acc: 0.983500
+EPOCH_LOG,10,58.956061,0.983500
+Epoch: 10,  Total iter: 600000,  Mean Loss: 0.001965202028,  Test Acc: 0.983500
+********************************************************************************
+Program complete... 
+********************************************************************************
