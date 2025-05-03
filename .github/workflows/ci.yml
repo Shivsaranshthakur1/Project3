@@ -47,10 +47,10 @@ jobs:
         python3 scripts/finite_diff_check.py
 
     - name: Run Gradcheck Target
-      run: make -C . gradcheck || true
+      run: make -C COMP36212_EX3_Code gradcheck || true
 
     - name: Run Plot Target
-      run: make -C . plot
+      run: make -C COMP36212_EX3_Code plot
 
     - name: Run Loss Trace Check
-      run: make -C . quickcheck
+      run: make -C COMP36212_EX3_Code quickcheck
