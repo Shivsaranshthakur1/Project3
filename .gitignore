@@ -5,3 +5,23 @@ mnist_data/*
 core
 dir_tree.txt
 *.log
+# ───────── build / generated artefacts ─────────
+# compiled objects / executables
+COMP36212_EX3_Code/*.out
+
+# run logs, grid-search outputs
+logs/
+results/*.csv*
+*.csvawk           # stray awk temp
+
+# auto-generated figures
+figures/
+
+# LaTeX build files
+*.aux
+*.log
+*.synctex.gz
+*.out
+
+# backup / editor junk
+*~ *# .DS_Store
