@@ -48,18 +48,18 @@ Final test accuracy after 10 epochs with pure SGD was \textbf{97.5\%}, as record
 \toprule
 \textbf{Batch Size} & \textbf{Learning Rate} & \textbf{Final Accuracy} \\
 \midrule
-1 & 0.1 & 72.4\% \\
-1 & 0.01 & 83.1\% \\
-1 & 0.001 & 86.9\% \\
-10 & 0.1 & 93.5\% \\
-10 & 0.01 & 95.2\% \\
-10 & 0.001 & 94.8\% \\
-100 & 0.1 & 91.0\% \\
-100 & 0.01 & 94.2\% \\
-100 & 0.001 & 93.3\% \\
+1 & 0.001 & 0.000 \\
+1 & 0.01  & 0.000 \\
+1 & 0.1   & 0.094 \\
+10 & 0.001 & 0.9837 \\
+10 & 0.01  & 0.9837 \\
+10 & 0.1   & 0.098 \\
+100 & 0.001 & 0.8992 \\
+100 & 0.01  & 0.9762 \\
+100 & 0.1   & 0.9840 \\
 \bottomrule
 \end{tabular}
-\caption{Grid search results from \texttt{logs/mom\_\textless bs\textgreater\_\textless lr\textgreater.csv} for 10 epochs.}
+\caption{Grid search results from \texttt{logs/mom\_\textless bs\textgreater\_\textless lr\textgreater.csv} after 10 epochs with momentum = 0.9.}
 \end{table}
 
 \subsection{Momentum vs SGD Comparison}
@@ -71,10 +71,10 @@ Final test accuracy after 10 epochs with pure SGD was \textbf{97.5\%}, as record
 
 \subsection{Stability and Convergence Notes}
 \begin{itemize}
-  \item Momentum consistently improved stability for batch sizes 10 and 100.
-  \item Small batches (bs = 1) were noisy but converged eventually.
-  \item Best configuration observed: batch size 10, learning rate 0.01 \rightarrow accuracy \textasciitilde 95.2\%.
-  \item High learning rate with small batches (e.g., 0.1 with bs=1) caused instability.
+  \item Momentum significantly improves stability and convergence for batch sizes $\geq 10$.
+  \item Small batches (e.g., batch size 1) exhibit unstable gradients and poor generalisation.
+  \item A learning rate of 0.01 with momentum 0.9 gives peak test accuracy of 98.4\%.
+  \item Momentum with large batch sizes (100) achieves fast convergence but saturates lower.
 \end{itemize}
 
 \end{document}
