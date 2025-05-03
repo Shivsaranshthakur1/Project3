@@ -29,4 +29,4 @@ plot:
 	python3 ../scripts/plot_convergence.py
 
 quickcheck:
-	python3 scripts/loss_trace.py
+	python3 ../scripts/loss_trace.py
