@@ -5,7 +5,7 @@ losses = []
 
 for i in range(100):
     cmd = [
-        "./COMP36212_EX3_Code/mnist_optimiser.out",
+        "./mnist_optimiser.out",
         "mnist_data",
         "0.1", "0.1",  # lr0 = lrN
         "1",           # batch size
