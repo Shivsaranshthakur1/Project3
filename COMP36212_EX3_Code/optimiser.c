@@ -63,6 +63,8 @@ void run_optimisation(void) {
                 test_accuracy = evaluate_testing_accuracy();
                 printf("EPOCH_LOG,%u,%f,%f\n", epoch_counter, mean_loss, test_accuracy);
                 print_training_stats(epoch_counter, total_iter, mean_loss, test_accuracy);
+                printf("Mean Loss: %f\n", mean_loss);
+                fflush(stdout);  // ✅ Required to ensure subprocess capture works
                 mean_loss = 0.0;
             }
 

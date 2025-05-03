@@ -30,3 +30,7 @@ plot:
 
 quickcheck:
 	python3 ../scripts/loss_trace.py
+
+run_all:
+	../scripts/run_all.sh
+	./scripts/run_all.sh
