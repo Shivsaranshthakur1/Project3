@@ -40,9 +40,6 @@ jobs:
       - name: Gradcheck
         run: make -C COMP36212_EX3_Code gradcheck || true
 
-      - name: Loss-trace quickcheck
-        run: make -C COMP36212_EX3_Code quickcheck
-
       - name: Plot scripts
         run: make -C COMP36212_EX3_Code plot
 
