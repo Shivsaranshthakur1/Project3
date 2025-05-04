@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install GCC 13
+      - name: Install GCC 13
         run: |
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
           sudo apt-get update
@@ -32,7 +32,7 @@ jobs:
       - name: Build
         run: make -C COMP36212_EX3_Code CC=${{ matrix.compiler }} CFLAGS="-O3 -Wall -Werror"
 
-      - name: Unit‑tests (C)
+      - name: Unit-tests (C)
         run: make -C COMP36212_EX3_Code test
 
       - uses: actions/setup-python@v4
@@ -44,15 +44,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install numpy matplotlib
 
-      # ---------- NEW: download & unpack MNIST ----------
       - name: Fetch MNIST dataset
         run: |
           mkdir -p mnist_data
-          curl -L http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz  | gunzip -c > mnist_data/train-images-idx3-ubyte
-          curl -L http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz  | gunzip -c > mnist_data/train-labels-idx1-ubyte
-          curl -L http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz   | gunzip -c > mnist_data/t10k-images-idx3-ubyte
-          curl -L http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz   | gunzip -c > mnist_data/t10k-labels-idx1-ubyte
-      # --------------------------------------------------
+          base=https://storage.googleapis.com/cvdf-datasets/mnist
+          for f in train-images-idx3-ubyte.gz \
+                   train-labels-idx1-ubyte.gz \
+                   t10k-images-idx3-ubyte.gz \
+                   t10k-labels-idx1-ubyte.gz; do
+            curl -fsSL --retry 5 --retry-delay 2 $base/$f -o /tmp/$f
+            gunzip -c /tmp/$f > mnist_data/${f%.gz}
+          done
 
       - name: Gradcheck
         run: make -C COMP36212_EX3_Code gradcheck || true
