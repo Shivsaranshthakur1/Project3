@@ -1,0 +1,36 @@
+Layer,Index,Numeric,Analytic,Rel_Error,Pass
+Loading training set...
+Training set loaded successfully...
+
+Loading training set labels...
+Training set labels loaded successfully...
+
+Loading testing set...
+Testing set loaded successfully...
+
+Loading testing set labels...
+Testing set labels loaded successfully...
+PRNG initialised using seed: 1746384411
+Initialising weight matrices
+Address in neural_network.c: 0x1273904a8
+Initialising gradient and Jacobian datastructures
+Initialising neuron datastructures
+
+Optimising with parameters:
+	lr0 = 0.100000, lrN = 0.100000
+	batch_size = 1, epochs = 1
+	beta1/momentum = 0.000000, beta2 = 0.000000, eps = 0.000000
+	opt_flag = 0
+
+LI_L1,200130,0.000000e+00,0.000000e+00,0.000000e+00,PASS
+LI_L1,231291,0.000000e+00,0.000000e+00,0.000000e+00,PASS
+LI_L1,54815,2.103812e-02,1.051906e-01,8.415248e-02,FAIL
+L1_L2,29872,0.000000e+00,0.000000e+00,0.000000e+00,PASS
+L1_L2,2761,0.000000e+00,0.000000e+00,0.000000e+00,PASS
+L1_L2,23841,0.000000e+00,0.000000e+00,0.000000e+00,PASS
+L2_L3,3610,0.000000e+00,0.000000e+00,0.000000e+00,PASS
+L2_L3,337,0.000000e+00,0.000000e+00,0.000000e+00,PASS
+L2_L3,2598,-1.026770e-02,-1.745509e-01,1.642832e-01,FAIL
+L3_LO,441,2.195921e-02,4.172249e-01,3.952657e-01,FAIL
+L3_LO,94,0.000000e+00,0.000000e+00,0.000000e+00,PASS
+L3_LO,780,7.128271e-03,1.639502e-01,1.568220e-01,FAIL
